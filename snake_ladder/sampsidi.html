@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+
+        }
+
+        .container {
+            width: 1000px;
+            height: 1000px;
+
+            margin: auto;
+            background-color: aqua;
+            display: flex;
+            flex-wrap: wrap;
+
+        }
+
+        .box {
+            border: 1px solid black;
+            height: 100px;
+            width: 100px;
+            box-sizing: border-box;
+            text-align: center;
+            font-size: 30px;
+            position: relative;
+        }
+
+        .dice {
+            height: 400px;
+            text-align: center;
+
+        }
+
+        #btn {
+            width: 134px;
+            height: 60px;
+            font-size: 24px;
+            margin: 51px;
+            background-color: rgb(58, 58, 240);
+            color: white;
+            border-radius: 10px;
+            border: none;
+
+        }
+
+        .snake1 {
+            position: absolute;
+            z-index: 2;
+            left: 23px;
+            top: 22px;
+            height: 450px;
+
+        }
+
+        .snake2 {
+            position: absolute;
+            z-index: 2;
+            left: -152px;
+            height: 304px;
+            top: 30px;
+        }
+
+        .ladder1 {
+            position: absolute;
+            z-index: 2;
+            height: 385px;
+            right: -61px;
+        }
+
+        .ladder2 {
+            position: absolute;
+            z-index: 2;
+            height: 245px;
+            right: 93px;
+            top: 23px;
+        }
+
+        .Player {
+            height: 40px;
+            width: 100px;
+            font-size: 20px;
+
+        }
+
+        .Player2 {
+            height: 40px;
+            width: 100px;
+            font-size: 20px;
+        }
+
+        .player1 {
+            background-color: #000 !important;
+            transition: background-color 0.5s ease-in-out;
+            animation: flicker 1s ease-in-out;
+        }
+
+        .player1:before {
+            content: '';
+            width: 44px;
+            height: 89px;
+            background-image: url(image/playerblue.png);
+            display: block;
+            position: absolute;
+            background-size: contain;
+            left: calc(50% - 22px);
+        }
+
+        .play2:before {
+            content: '';
+            width: 44px;
+            height: 89px;
+            background-image: url(image/player1.png);
+            display: block;
+            position: absolute;
+            background-size: contain;
+            left: calc(50% - 22px);
+        }
+
+        .play2 {
+            background-color: aqua !important;
+            transition: background-color 0.5s ease-in-out;
+            animation: flicker 1s ease-in-out;
+        }
+
+        @keyframes flicker {
+            0% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.3;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+
+    </div>
+    <div class="dice">
+        <button class="Player">Player 1</button>
+        <button id="btn">Click Here</button>
+        <button disabled class="Player2">Player 2</button>
+
+        <div class="player-position" id="playerPosition">Player Position: 1</div>
+
+        <div id="result"></div>
+    </div>
+    <script>
+        const boardSize = 100;
+
+        let player1Position = 0;
+        let player2Position = 0;
+        let diceResult = 0;
+        snakes = [98, 32,45,70,85];
+        ladders = [8, 53,40,33,46,65];
+        var mainBox = document.querySelector('.container');
+        var clickButton = document.getElementById("btn");
+        player1 = document.querySelector(".Player")
+        player2 = document.querySelector(".Player2")
+
+        var colors = ['#FF5733', '#33FF57', '#3357FF', '#F3FF33', '#FF33A1', '#A133FF'];
+        for (let i = 100; i >= 1; i--) {
+            mainBox.innerHTML += "<div class='box' id='a" + i + "' style='background-color:" + colors[i % colors
+                .length] + "'>" + i + "<span></span></div>";
+
+
+        }
+        var snake1 = document.querySelector('#a98 span').innerHTML = "<img src='image/snake1.png' class='snake1'>";
+        var snake2 = document.querySelector('#a45 span').innerHTML = "<img src='image/snake1.png' class='snake1'>";
+        var snake3 = document.querySelector('#a70 span').innerHTML = "<img src='image/snake1.png' class='snake1'>";
+        var snake3 = document.querySelector('#a85 span').innerHTML = "<img src='image/snake1.png' class='snake1'>";
+        snake2 = document.querySelector('#a32 span').innerHTML = "<img src='image/snake2.png' class='snake2'>";
+        ladder3 = document.querySelector('#a95 span').innerHTML = '<img src="image/ladder1.png" class="ladder1">';
+        ladder6 = document.querySelector('#a76 span').innerHTML = '<img src="image/ladder1.png" class="ladder1">';
+        ladder1 = document.querySelector('#a83 span').innerHTML = '<img src="image/ladder1.png" class="ladder1">';
+        var ladder2 = document.querySelector('#a26 span').innerHTML = '<img src="image/ladder2.png" class="ladder2">';
+        var ladder4 = document.querySelector('#a58 span').innerHTML = '<img src="image/ladder2.png" class="ladder2">';
+        var ladder5 = document.querySelector('#a51 span').innerHTML = '<img src="image/ladder2.png" class="ladder2">';
+
+        function playgame(player) {
+
+            let diceroll = new Audio('image/dice.mp3');
+            diceroll.play(); // Play sound when reaching the final position
+            var rendomNumber = Math.floor(Math.random() * 6 + 1);
+
+            let diceElement = document.getElementById('result');
+            /**
+             // Start rolling animation (Change dice images quickly)
+
+             let rollCount = 0; // Count how many times it rolls
+
+             // Start rolling animation (Change dice images quickly)
+             let rollingAnimation = setInterval(() => {
+                 let randomFace = Math.floor(Math.random() * 6) + 1;
+                 diceElement.innerHTML =
+                     `<img src='image/${randomFace}.jpg' style='animation: shake 0.2s infinite;'>`;
+
+                 rollCount++;
+                 if (rollCount >= 10) { // Stop after 10 cycles (~1 sec)
+                     clearInterval(rollingAnimation);
+                 }
+             }, 100); // Change image every 100ms
+
+             **/
+
+            diceroll.onended = function () {
+                // Add player class to the new position
+            
+                document.getElementById('result').innerHTML = "<img src='image/" + rendomNumber + ".jpg'/>";
+                let playerPosition = (player == 'player1') ? player1Position : player2Position;
+
+                if (playerPosition == 0 && rendomNumber < 6) {
+                   
+                    return ;
+                }else if(playerPosition >1 && playerPosition < 100 && (100-playerPosition) < rendomNumber ){
+                    return;
+                }
+                if(playerPosition < 100 ){
+                    var newPosition = playerPosition + rendomNumber;
+                }else {
+                    newPosition=100;
+                }
+                
+                document.getElementById('playerPosition').innerHTML = 'Player Position: ' + newPosition;
+
+                let currentStep = playerPosition; // Start from current position
+                let interval = setInterval(() => {
+                    if (currentStep < newPosition) {
+                        // Remove player class from previous position
+                        if (document.querySelector('.' + player)) {
+                            document.querySelector('.' + player).classList.remove(player);
+                        }
+
+                        currentStep++; // Move one step forward
+                        let step = new Audio('image/step.wav');
+                        step.play(); // Play sound when reaching the final position
+                        // Add player class to the new position
+                        document.getElementById("a" + currentStep).classList.add(player);
+                    } else {
+                        clearInterval(interval); // Stop movement when reaching final position
+
+                        // Check for snakes or ladders **after** reaching the final position
+                        setTimeout(() => {
+                            if (snakes.includes(newPosition)) {
+                            
+                                if (newPosition === 32) {
+                                    newPosition -= 29;
+                                } else if (newPosition === 45) {
+                                    newPosition -= 41;
+                                } else if (newPosition === 70) {
+                                    newPosition -= 41;
+                                } else if (newPosition === 85) {
+                                    newPosition -= 41;
+                                } else {
+                                    newPosition -= 41; // Default case
+                                }
+
+                                let snakesound = new Audio('image/snake.mp3');
+                                snakesound.play(); // Play sound when reaching the final position
+
+                            } else if (ladders.includes(newPosition)) {
+                                
+                               if (newPosition === 8) {
+                                    newPosition += 19;
+                                } else if (newPosition === 40) {
+                                    newPosition += 19;
+                                } else if (newPosition === 33) {
+                                    newPosition += 19;
+                                } else if (newPosition ===46) {
+                                    newPosition += 29;
+                                }else if (newPosition ===65) {
+                                    newPosition += 29;
+                                } else {
+                                    newPosition += 29; // Default case
+                                }
+                                let ladder = new Audio('image/ladder.wav');
+                                ladder.play(); // Play sound when reaching the final position
+
+                            } else {
+
+                                let audio = new Audio('image/gmm.wav');
+                                audio.play(); // Play sound when reaching the final position
+
+                            }
+
+                            // Remove player from old position and update to new snake/ladder position
+                            if (document.querySelector('.' + player)) {
+                                document.querySelector('.' + player).classList.remove(player);
+                            }
+                            document.getElementById("a" + newPosition).classList.add(player);
+
+                            
+
+                            // Update player position
+                            if (player == 'player1') {
+                                player1Position = newPosition;
+                            } else {
+                                player2Position = newPosition;
+                            }
+
+                            console.log('player1=' + player1Position + " player2=" +
+                                player2Position);
+                        }, 500); // Small delay for snake/ladder effect
+                    }
+                }, 300); // Move every 300ms (adjust for smoothness)
+            }
+        }
+
+
+        player1.onclick = function () {
+
+            playgame('player1')
+
+              
+                player1.disabled = true;
+                player2.disabled = false;
+                
+                
+            
+            
+        }
+        player2.onclick = function () {
+            playgame('play2')
+                    player2.disabled = true;
+                    player1.disabled = false;
+                }
+                
+               
+            
+            
+        
+    </script>
+</body>
+
+</html>
