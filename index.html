@@ -84,10 +84,15 @@
         }
 
         .Player {
-            height: 40px;
-            width: 100px;
+            height: 120px;
+            width: 120px;
             font-size: 20px;
+            border-radius: 17px;
 
+        }
+
+        .Player img {
+            width:90%;
         }
 
         .Player2 {
@@ -130,6 +135,28 @@
             animation: flicker 1s ease-in-out;
         }
 
+        .playerbox {
+            display: flex;
+    padding: 10px;
+   
+    width: 282px;
+    align-items: center;
+
+        }
+
+        .playerbox .playericon {
+            width: 124px;
+    height: 74px;
+    border: 1px solid red;
+    padding: 5px;
+        }
+
+        .gamebox {
+            width:1000px;
+            margin: auto;
+
+        }
+
         @keyframes flicker {
             0% {
                 opacity: 1;
@@ -147,18 +174,23 @@
 </head>
 
 <body>
+    <div class="gamebox">
     <div class="container">
 
     </div>
     <div class="dice">
-        <button class="Player">Player 1</button>
-        <button id="btn">Click Here</button>
+       <div class="playerbox">
+        <div class="playericon"><img style="height:75px;width:auto;" src="image/player1.png" alt=""></div><button class="Player aplayer1">Player 1</button>
+       </div>
+        
+        
         <button disabled class="Player2">Player 2</button>
 
         <div class="player-position" id="playerPosition">Player Position: 1</div>
 
         <div id="result"></div>
     </div>
+</div>
     <script>
         const boardSize = 100;
 
@@ -219,7 +251,7 @@
 
             diceroll.onended = function () {
                 // Add player class to the new position
-            
+                document.querySelector('.a'+player).innerHTML = "<img src='image/" + rendomNumber + ".jpg'/>";
                 document.getElementById('result').innerHTML = "<img src='image/" + rendomNumber + ".jpg'/>";
                 let playerPosition = (player == 'player1') ? player1Position : player2Position;
 
